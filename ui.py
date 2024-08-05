@@ -1,5 +1,6 @@
 from typing import Callable, TypeVar
 
+from langchain_openai import ChatOpenAI
 from streamlit.runtime.scriptrunner import add_script_run_ctx, get_script_run_ctx
 from streamlit.delta_generator import DeltaGenerator
 from langchain_community.callbacks.streamlit import StreamlitCallbackHandler
@@ -7,7 +8,7 @@ from langchain_core.runnables import RunnableConfig
 from openbb import obb
 from dotenv import load_dotenv
 
-from app.chains.clear_results import with_clear_container
+# from app.chains.clear_results import with_clear_container
 from app.chains.agent import create_anthropic_agent_graph
 
 import os
@@ -17,15 +18,15 @@ import uuid
 import pandas as pd
 import streamlit as st
 
-warnings.filterwarnings("ignore")
+# warnings.filterwarnings("ignore")
 
 load_dotenv()
 
-obb.account.login(pat=os.environ.get("OPENBB_TOKEN"), remember_me=True)
-obb.user.credentials.tiingo_token = os.environ.get("TIINGO_API_KEY")
-obb.user.credentials.fmp_api_key = os.environ.get("FMP_API_KEY")
-obb.user.credentials.intrinio_api_key = os.environ.get("INTRINIO_API_KEY")
-obb.user.credentials.fred_api_key = os.environ.get("FRED_API_KEY")
+# obb.account.login(pat=os.environ.get("OPENBB_TOKEN"), remember_me=True)
+# obb.user.credentials.tiingo_token = os.environ.get("TIINGO_API_KEY")
+# obb.user.credentials.fmp_api_key = os.environ.get("FMP_API_KEY")
+# obb.user.credentials.intrinio_api_key = os.environ.get("INTRINIO_API_KEY")
+# obb.user.credentials.fred_api_key = os.environ.get("FRED_API_KEY")
 
 pd.set_option("display.max_columns", None)
 pd.set_option("display.max_rows", None)
@@ -81,7 +82,7 @@ with st.form(key="form"):
     submit_clicked = st.form_submit_button("Submit Question")
 
 output_container = st.empty()
-if with_clear_container(submit_clicked):
+if submit_clicked:
     output_container = output_container.container()
 
     output_container.markdown(f"**User:** {user_input}")
@@ -95,8 +96,10 @@ if with_clear_container(submit_clicked):
     cfg["configurable"] = {"thread_id": uuid.uuid4()}
 
     question = {"messages": ("user", user_input)}
-
     response = st.session_state.graph.invoke(question, cfg)
+    # question = {"input": user_input}
+    # llm = ChatOpenAI(model="gpt-4o", temperature=0, streaming=True)
+    # response = llm.invoke(question, cfg)
     answer = response["messages"][-1].content
 
     st.session_state.messages.append({"role": "assistant", "content": answer})

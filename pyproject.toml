@@ -38,6 +38,7 @@ pandas-datareader = "^0.10.0"
 boto3 = "^1.34.120"
 langchain-aws = "^0.1.6"
 langchain-experimental = "^0.0.60"
+langchain-openai = "*"
 
 
 [build-system]

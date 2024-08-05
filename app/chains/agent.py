@@ -1,5 +1,7 @@
 from typing import Annotated, TypedDict, Optional, Literal, Callable
 
+# from langchain_community.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_anthropic import ChatAnthropic
 from langchain_aws import ChatBedrock
@@ -302,8 +304,10 @@ def route_primary_assistant(state: AgentState) -> Literal[
     raise ValueError("Invalid route")
 
 
-def create_anthropic_agent_graph() -> StateGraph:
-    llm = ChatAnthropic(temperature=0, model_name="claude-3-opus-20240229")
+def create_anthropic_agent_graph():
+    # llm = ChatAnthropic(temperature=0, model_name="claude-3-opus-20240229")
+    llm = ChatOpenAI(model="gpt-4o", temperature=0, streaming=True)
+
     # llm = ChatBedrock(
     #     region_name="us-east-1",
     #     credentials_profile_name="deploy",
@@ -438,3 +442,7 @@ if __name__ == "__main__":
 
     with open("graph_output.json", "w") as f:
         json.dump(graph.get_graph().to_json(), f)
+
+    response = graph.invoke({"input":"hi"})
+    print(f"RESPONSE: {response}")
+    print("SUCCESS")
